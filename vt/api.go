@@ -1,0 +1,4 @@
+package vt
+
+func Print() {
+}
