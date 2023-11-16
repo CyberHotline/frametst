@@ -1,27 +1,127 @@
 package vt
 
 import (
-	vi "github.com/VirusTotal/vt-go"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
 )
 
-func Fileinfo(key, h *string) {
-	cli := vi.NewClient(*key)
-	file, _ := cli.GetObject(vi.URL("files/%s", *h))
-
-	name, _ := file.GetString("meaningful_name")
-	description, _ := file.GetString("type_description")
-	typetags, _ := file.GetStringSlice("type_tags")
-	s256, _ := file.GetString("sha256")
-	magic, _ := file.GetString("magic")
-	threatlabel, _ := file.GetString("popular_threat_classification.suggested_threat_label")
-	size, _ := file.GetInt64("size")
-	harmlessv, _ := file.GetInt64("total_votes.harmless")
-	maliciousv, _ := file.GetInt64("total_votes.malicious")
-	reputation, _ := file.GetInt64("reputation")
-	captags, _ := file.GetStringSlice("capabilities_tags")
-	creationdate, _ := file.GetTime("creation_date")
-	lastanalysisstats, _ := file.Get("last_analysis_stats")
-	lastanalysisdate, _ := file.GetTime("last_analysis_date")
-	uniquesource, _ := file.GetInt64("unique_sources")
-	Fmtfileinfo(lastanalysisstats, name, description, s256, magic, threatlabel, typetags, captags, size, harmlessv, maliciousv, reputation, uniquesource, creationdate, lastanalysisdate)
+type File struct {
+	Info      FileInfo
+	Behaviour Filebehaviour
 }
+
+type FileInfo struct {
+	Data struct {
+		Attributes struct {
+			Name            []string `json:"names"`
+			Magic           string   `json:"magic"`
+			Sha256          string   `json:"sha256"`
+			Md5             string   `json:"md5"`
+			Sha1            string   `json:"sha1"`
+			CreationDate    int      `json:"creation_date"`
+			FirstSubmission int      `json:"first_submission_date"`
+			Size            int      `json:"size"`
+			Tags            []string `json:"tags"`
+			SignatureInfo   struct {
+				Product      string `json:"product"`
+				Description  string `json:"description"`
+				Copyright    string `json:"copyright"`
+				OriginalName string `json:"original name"`
+				FileVersion  string `json:"file version"`
+				InternalName string `json:"internal name"`
+			} `json:"signature_info"`
+			LastAnalysisStats struct {
+				Harmless         int `json:"harmless"`
+				TypeUnsupported  int `json:"type-unsupported"`
+				Suspicious       int `json:"suspicious"`
+				ConfirmedTimeout int `json:"confirmed-timeout"`
+				Timeout          int `json:"timeout"`
+				Failure          int `json:"failure"`
+				Malicious        int `json:"malicious"`
+				Undetected       int `json:"undetected"`
+			}
+			Reputation int `json:"reputation"`
+		} `json:"attributes"`
+	} `json:"data"`
+}
+
+type Filebehaviour struct {
+	Data struct {
+		CallsHighlighted    []string `json:"calls_highlighted"`
+		MutexesCreated      []string `json:"mutexes_created"`
+		MutexesOpened       []string `json:"mutexes_opened"`
+		ProcessesTerminated []string `json:"processes_terminated"`
+		ProcessTree         []struct {
+			Name string `json:"name"`
+			PID  string `json:"process_id"`
+		}
+		RegistryKeysOpened []string `json:"registry_keys_opened"`
+		RegistryKeysSet    []struct {
+			Key   string `json:"key"`
+			Value string `json:"value"`
+		} `json:"registry_keys_set"`
+		MitreAttackTechniques []struct {
+			SignatureDescription string `json:"signature_description"`
+			ID                   string `json:"id"`
+			Severity             string `json:"severity"`
+		} `json:"mitre_attack_techniques"`
+		Verdicts              []string `json:"verdicts"`
+		FilesOpened           []string `json:"files_opened"`
+		FileAttributesChanged []string `json:"files_attribute_changed"`
+		ModulesLoaded         []string `json:"modules_loaded"`
+		TextHighlighted       []string `json:"text_highlighted"`
+		MemoryPatternIps      []string `json:"memory_pattern_ips"`
+		MemoryPatternDomains  []string `json:"memory_pattern_domains"`
+	} `json:"data"`
+}
+
+func (f File) guiurl() string {
+	return "https://www.virustotal.com/gui/file/" + f.Info.Data.Attributes.Sha256
+}
+
+func Fretriever(key, id string, l int) {
+	infourl := "https://www.virustotal.com/api/v3/files/" + id
+	behavioururl := "https://www.virustotal.com/api/v3/files/" + id + "/behaviour_summary"
+
+	inforeq, _ := http.NewRequest("GET", infourl, nil)
+	behaviourreq, _ := http.NewRequest("GET", behavioururl, nil)
+	inforeq.Header.Add("accept", "application/json")
+	inforeq.Header.Add("x-apikey", key)
+	behaviourreq.Header.Add("accept", "application/json")
+	behaviourreq.Header.Add("x-apikey", key)
+
+	infores, _ := http.DefaultClient.Do(inforeq)
+	behaviourres, _ := http.DefaultClient.Do(behaviourreq)
+
+	defer infores.Body.Close()
+	defer behaviourres.Body.Close()
+
+	infobody, _ := io.ReadAll(infores.Body)
+	behaviourbody, _ := io.ReadAll(behaviourres.Body)
+
+	// Retrieving File Data
+	var file File
+	var b Filebehaviour
+	var i FileInfo
+	ierr := json.Unmarshal([]byte(infobody), &i)
+	berr := json.Unmarshal([]byte(behaviourbody), &b)
+	if ierr != nil {
+		fmt.Println("Info Error:")
+		log.Fatal(ierr)
+	}
+	if berr != nil {
+		fmt.Println("Behaviour Error:")
+		log.Fatal(berr)
+	}
+	file.Info = i
+	file.Behaviour = b
+	FtableView(file, l)
+}
+
+// func Fileinfo(key, h *string, l *int) {
+// 	f := Fretriever(*key, *h)
+
+// }
