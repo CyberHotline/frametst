@@ -1,20 +1,55 @@
 package main
 
 import (
-	"flag"
+	"fmt"
+	"runtime"
+	"strings"
 
-	vt "github.com/mohabgabber/frametst/vt"
+	"os"
+	"os/exec"
+
+	prom "github.com/Songmu/prompter"
+	settings "github.com/mohabgabber/frametst/user"
+	// vt "github.com/mohabgabber/frametst/vt"
 )
 
+type Shell struct {
+	Path string
+}
+
 func main() {
-	// mode := os.Args[1]
-	//TODO create a command prompt with special commands to make it easier to interact with the tools as the tool gets stuffed with more and more tools (like metasploit)
-	vkey := flag.String("vk", "", "Virus Total Api Key")
-	level := flag.Int("l", 1, "Level of info retrieved, (1 lowest, 3 highest)")
-	hash := flag.String("id", "", "SHA-256/SHA-1/MD5 hash of a file")
-	flag.Parse()
-	vt.Fretriever(*vkey, *hash, *level)
-	// if *fbs {
-	// 	vt.Filebehavioursummary(vkey, hash)
-	// }
+	//TODO Add an interactive shell prompt
+	var s Shell
+	for {
+		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
+
+		switch p {
+		case "help":
+			settings.HelpMenu()
+		case "exit":
+			os.Exit(0)
+		case "clear":
+			if runtime.GOOS == "windows" {
+				c := exec.Command("cmd", "/c", "cls")
+				c.Stdout = os.Stdout
+				c.Run()
+			} else if runtime.GOOS == "linux" || runtime.GOOS == "darwin" {
+				c := exec.Command("clear")
+				c.Stdout = os.Stdout
+				c.Run()
+			}
+		case "config":
+			fmt.Println("Entered config mode. type 'back' to return to normal mode")
+			s.Path = "config"
+		case "back":
+			fmt.Println("Back to normal mode")
+			s.Path = ""
+		case "virustotal":
+			fmt.Println("Entered virus total mode")
+			fmt.Println("USAGE: file [LEVEL 1-3] [FILE HASH]")
+			fmt.Println("Type 'help' for more info")
+			s.Path = "virustotal"
+		}
+
+	}
 }
