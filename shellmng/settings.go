@@ -10,9 +10,11 @@ import (
 )
 
 var services = []string{"virustotal", "hybrudanalysis", "anyrun", "malwarebazaar", "all"}
-var q Keys
-var rf, _ = os.ReadFile("frametst_config.xml")
-var _ = xml.Unmarshal(rf, &q)
+var Q Keys
+var homedir, _ = os.UserHomeDir()
+var cfgpath = homedir + "/.frametst_config.xml"
+var rf, _ = os.ReadFile(cfgpath)
+var _ = xml.Unmarshal(rf, &Q)
 
 type Keys struct {
 	XMLName        xml.Name `xml:"APIKEYS"`
@@ -51,11 +53,19 @@ func (k *Keys) Set(service, data string) {
 	}
 }
 
+func (k *Keys) Configwrite() {
+	s, _ := xml.MarshalIndent(k, "", "  ")
+	os.WriteFile(cfgpath, s, fs.FileMode(os.O_WRONLY))
+}
+
 func HelpMenu() {
 	fmt.Println("List Of Available Commands")
-	fmt.Printf("\thelp\tPrint Help Menu\n")
-	fmt.Printf("\texit\tClose The Prompt\n")
-	fmt.Printf("\tconfig\tManage Your Config File\n")
+	fmt.Println("\tGeneral:")
+	fmt.Printf("\t help\tPrint Help Menu\n")
+	fmt.Printf("\t exit\tClose The Prompt\n")
+	fmt.Println("\tModules:")
+	fmt.Printf("\t config\tManage Your Config File\n")
+	fmt.Println("\t vt\tVirustotal Operations")
 }
 
 func Configmng(order string) {
@@ -71,19 +81,14 @@ func Configmng(order string) {
 	} else if sliced[0] == "creds" {
 		if sliced[1] == "delete" {
 			if slices.Contains(services, sliced[2]) {
-				q.Reset(sliced[2])
-				q.Configwrite()
+				Q.Reset(sliced[2])
+				Q.Configwrite()
 			}
 		} else if sliced[1] == "set" {
 			if slices.Contains(services, sliced[2]) {
-				q.Set(sliced[2], sliced[3])
-				q.Configwrite()
+				Q.Set(sliced[2], sliced[3])
+				Q.Configwrite()
 			}
 		}
 	}
-}
-
-func (k *Keys) Configwrite() {
-	s, _ := xml.MarshalIndent(k, "", "  ")
-	os.WriteFile("frametst_config.xml", s, fs.FileMode(os.O_WRONLY))
 }

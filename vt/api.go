@@ -6,6 +6,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
+
+	mng "github.com/mohabgabber/frametst/shellmng"
 )
 
 type File struct {
@@ -121,7 +125,7 @@ func (f File) guiurl() string {
 	return "https://www.virustotal.com/gui/file/" + f.Info.Data.Attributes.Sha256
 }
 
-func Fretriever(key, id string, l int) {
+func Fretriever(key, id string, l int) (File, int) {
 	infourl := "https://www.virustotal.com/api/v3/files/" + id
 	behavioururl := "https://www.virustotal.com/api/v3/files/" + id + "/behaviour_summary"
 
@@ -157,5 +161,17 @@ func Fretriever(key, id string, l int) {
 	}
 	file.Info = i
 	file.Behaviour = b
-	FtableView(file, l)
+	return file, l
+}
+
+func Mng(order string) {
+	sliced := strings.Split(order, " ")
+	if sliced[0] == "help" {
+		fmt.Println("USAGE of the virustotal module:")
+		fmt.Println("\thelp\tPrint The Help Menu")
+		fmt.Println("\tfile [LEVEL 1-3] [HASH]\tScan a file")
+	} else if sliced[0] == "file" {
+		level, _ := strconv.Atoi(sliced[1])
+		FtableView(Fretriever(mng.Q.VirusTotal, sliced[2], level))
+	}
 }

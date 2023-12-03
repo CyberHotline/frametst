@@ -257,5 +257,5 @@ func FtableView(f File, l int) {
 		fmt.Println()
 	}
 	fmt.Printf("\nView The GUI Report: \t %v", f.guiurl())
-
+	fmt.Println()
 }
