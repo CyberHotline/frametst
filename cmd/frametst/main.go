@@ -9,7 +9,7 @@ import (
 	"os/exec"
 
 	prom "github.com/Songmu/prompter"
-	settings "github.com/mohabgabber/frametst/user"
+	mng "github.com/mohabgabber/frametst/shellmng"
 	// vt "github.com/mohabgabber/frametst/vt"
 )
 
@@ -18,37 +18,42 @@ type Shell struct {
 }
 
 func main() {
-	//TODO Add an interactive shell prompt
 	var s Shell
 	for {
 		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
+		if p != "" {
 
-		switch p {
-		case "help":
-			settings.HelpMenu()
-		case "exit":
-			os.Exit(0)
-		case "clear":
-			if runtime.GOOS == "windows" {
-				c := exec.Command("cmd", "/c", "cls")
-				c.Stdout = os.Stdout
-				c.Run()
-			} else if runtime.GOOS == "linux" || runtime.GOOS == "darwin" {
-				c := exec.Command("clear")
-				c.Stdout = os.Stdout
-				c.Run()
+			if s.Path == "" || p == "back" {
+				switch p {
+				case "help":
+					mng.HelpMenu()
+				case "exit":
+					os.Exit(0)
+				case "clear":
+					if runtime.GOOS == "windows" {
+						c := exec.Command("cmd", "/c", "cls")
+						c.Stdout = os.Stdout
+						c.Run()
+					} else if runtime.GOOS == "linux" || runtime.GOOS == "darwin" {
+						c := exec.Command("clear")
+						c.Stdout = os.Stdout
+						c.Run()
+					}
+				case "config":
+					fmt.Println("Entered config mode. type 'back' to return to normal mode")
+					s.Path = "config"
+				case "back":
+					fmt.Println("Back to normal mode")
+					s.Path = ""
+				case "virustotal":
+					fmt.Println("Entered virus total mode")
+					fmt.Println("USAGE: file [LEVEL 1-3] [FILE HASH]")
+					fmt.Println("Type 'help' for more info")
+					s.Path = "virustotal"
+				}
+			} else if s.Path == "config" {
+				mng.Configmng(p)
 			}
-		case "config":
-			fmt.Println("Entered config mode. type 'back' to return to normal mode")
-			s.Path = "config"
-		case "back":
-			fmt.Println("Back to normal mode")
-			s.Path = ""
-		case "virustotal":
-			fmt.Println("Entered virus total mode")
-			fmt.Println("USAGE: file [LEVEL 1-3] [FILE HASH]")
-			fmt.Println("Type 'help' for more info")
-			s.Path = "virustotal"
 		}
 
 	}
