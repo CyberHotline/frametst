@@ -23,7 +23,7 @@ func main() {
 		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
 		if p != "" {
 
-			if s.Path == "" || p == "back" || p == "clear" {
+			if s.Path == "" || p == "back" || p == "clear " {
 				switch p {
 				case "help":
 					mng.HelpMenu()

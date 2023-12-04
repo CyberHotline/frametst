@@ -12,6 +12,8 @@ import (
 	mng "github.com/mohabgabber/frametst/shellmng"
 )
 
+var BASEURL string = "https://www.virustotal.com/api/v3/"
+
 type File struct {
 	Info      FileInfo
 	Behaviour Filebehaviour
@@ -125,9 +127,33 @@ func (f File) guiurl() string {
 	return "https://www.virustotal.com/gui/file/" + f.Info.Data.Attributes.Sha256
 }
 
+type IP struct {
+	Data struct {
+		Attributes struct {
+			Whois             string   `json:"whois"`
+			WhoisDate         int      `json:"whois_date"`
+			Tags              []string `json:"tags"`
+			LastAnalysisDate  int      `json:"last_analysis_date"`
+			LastAnalysisStats struct {
+				Harmless   int `json:"harmless"`
+				Malicious  int `json:"malicious"`
+				Suspicious int `json:"suspicious"`
+				Undetected int `json:"undetected"`
+				Timeout    int `json:"timeout"`
+			} `json:"last_analysis_stats"`
+			Reputation int    `json:"reputation"`
+			Network    string `json:"network"`
+			TotalVotes struct {
+				Harmless  int `json:"harmless"`
+				Malicious int `json:"malicious"`
+			} `json:"total_votes"`
+		}
+	}
+}
+
 func Fretriever(key, id string, l int) (File, int) {
-	infourl := "https://www.virustotal.com/api/v3/files/" + id
-	behavioururl := "https://www.virustotal.com/api/v3/files/" + id + "/behaviour_summary"
+	infourl := BASEURL + "files/" + id
+	behavioururl := BASEURL + "files/" + id + "/behaviour_summary"
 
 	inforeq, _ := http.NewRequest("GET", infourl, nil)
 	behaviourreq, _ := http.NewRequest("GET", behavioururl, nil)
@@ -170,8 +196,36 @@ func Mng(order string) {
 		fmt.Println("USAGE of the virustotal module:")
 		fmt.Println("\thelp\tPrint The Help Menu")
 		fmt.Println("\tfile [LEVEL 1-3] [HASH]\tScan a file")
+		fmt.Println("\tip [IP ADDRESS]\tReport on IP address")
 	} else if sliced[0] == "file" {
 		level, _ := strconv.Atoi(sliced[1])
 		FtableView(Fretriever(mng.Q.VirusTotal, sliced[2], level))
+	} else if sliced[0] == "ip" {
+		IPtableView(IPRetriever(mng.Q.VirusTotal, sliced[1]))
 	}
+}
+
+func IPRetriever(key, ip string) IP {
+	infourl := BASEURL + "ip_addresses/" + ip
+
+	inforeq, _ := http.NewRequest("GET", infourl, nil)
+	inforeq.Header.Add("accept", "application/json")
+	inforeq.Header.Add("x-apikey", key)
+
+	infores, err := http.DefaultClient.Do(inforeq)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer infores.Body.Close()
+
+	infobody, _ := io.ReadAll(infores.Body)
+
+	// Retrieving IP Data
+	var ADD IP
+	ierr := json.Unmarshal([]byte(infobody), &ADD)
+	if ierr != nil {
+		fmt.Println("Info Error:")
+		log.Fatal(ierr)
+	}
+	return ADD
 }

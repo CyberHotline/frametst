@@ -259,3 +259,39 @@ func FtableView(f File, l int) {
 	fmt.Printf("\nView The GUI Report: \t %v", f.guiurl())
 	fmt.Println()
 }
+
+func IPtableView(ip IP) {
+
+	fmt.Println("Last Analysis Stats:")
+	l := list.NewWriter()
+	l.AppendItem("Harmless: " + fmt.Sprint(ip.Data.Attributes.LastAnalysisStats.Harmless))
+	l.AppendItem("Malicious: " + fmt.Sprint(ip.Data.Attributes.LastAnalysisStats.Malicious))
+	l.AppendItem("Suspicious: " + fmt.Sprint(ip.Data.Attributes.LastAnalysisStats.Suspicious))
+	l.AppendItem("Undetected: " + fmt.Sprint(ip.Data.Attributes.LastAnalysisStats.Undetected))
+	l.AppendItem("Timeout: " + fmt.Sprint(ip.Data.Attributes.LastAnalysisStats.Timeout))
+	l.SetStyle(list.StyleBulletStar)
+	Listprint(l.Render())
+	fmt.Println("Last Analysis Date: " + time.Unix(int64(ip.Data.Attributes.LastAnalysisDate), 0).String())
+	fmt.Println()
+
+	fmt.Println("Community Votes:")
+	v := list.NewWriter()
+	v.AppendItem("Reputation: " + fmt.Sprint(ip.Data.Attributes.Reputation))
+	v.AppendItem("Harmless: " + fmt.Sprint(ip.Data.Attributes.TotalVotes.Harmless))
+	v.AppendItem("Malicious: " + fmt.Sprint(ip.Data.Attributes.TotalVotes.Malicious))
+	Listprint(v.Render())
+	fmt.Println()
+
+	fmt.Println("IP Report:")
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"Attribute", "Value"})
+	t.AppendRow(table.Row{"Whois", ip.Data.Attributes.Whois})
+	t.AppendRow(table.Row{"Whois Date", time.Unix(int64(ip.Data.Attributes.WhoisDate), 0)})
+	t.AppendRow(table.Row{"Tags", ip.Data.Attributes.Tags})
+	t.AppendRow(table.Row{"Network", ip.Data.Attributes.Network})
+	t.SetStyle(table.StyleColoredDark)
+	t.Render()
+	fmt.Println()
+
+}

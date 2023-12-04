@@ -61,10 +61,10 @@ func (k *Keys) Configwrite() {
 func HelpMenu() {
 	fmt.Println("List Of Available Commands")
 	fmt.Println("\tGeneral:")
-	fmt.Printf("\t help\tPrint Help Menu\n")
-	fmt.Printf("\t exit\tClose The Prompt\n")
+	fmt.Println("\t help\tPrint Help Menu")
+	fmt.Println("\t exit\tClose The Prompt")
 	fmt.Println("\tModules:")
-	fmt.Printf("\t config\tManage Your Config File\n")
+	fmt.Println("\t config\tManage Your Config File")
 	fmt.Println("\t vt\tVirustotal Operations")
 }
 
