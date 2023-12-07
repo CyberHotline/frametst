@@ -53,6 +53,23 @@ func (k *Keys) Set(service, data string) {
 	}
 }
 
+func (k *Keys) Show(service string) {
+	if service == "virustotal" {
+		fmt.Println("VirusTotal: " + k.VirusTotal)
+	} else if service == "anyrun" {
+		fmt.Println("Any.Run: " + k.AnyRun)
+	} else if service == "malwarebazaar" {
+		fmt.Println("Malware Bazaar: " + k.MalwareBazaar)
+	} else if service == "hybridanalysis" {
+		fmt.Println("Hybrid Analysis: " + k.HybridAnalysis)
+	} else if service == "all" {
+		fmt.Println("VirusTotal: " + k.VirusTotal)
+		fmt.Println("Any.Run: " + k.AnyRun)
+		fmt.Println("Malware Bazaar: " + k.MalwareBazaar)
+		fmt.Println("Hybrid Analysis: " + k.HybridAnalysis)
+	}
+}
+
 func (k *Keys) Configwrite() {
 	s, _ := xml.MarshalIndent(k, "", "  ")
 	os.WriteFile(cfgpath, s, fs.FileMode(os.O_WRONLY))
@@ -76,8 +93,11 @@ func Configmng(order string) {
 		fmt.Println("\tManaging Saved Creds:")
 		fmt.Println("\t Example: creds set virustotal 12341234123412341234123412341234")
 		fmt.Println("\t Options:")
-		fmt.Println("\t\tdelete [virustotal/anyrun/malwarebazaar/hybridanalysis/all] \t Delete Saved API Keys")
-		fmt.Println("\t\tset [virustotal/anyrun/malwarebazaar/hybridanalysis] [API KEY] \t Set API Key")
+		fmt.Println("\t\tdelete [MODULE] \t Delete Saved API Keys")
+		fmt.Println("\t\tset [MODULE] [API KEY] \t Set API Key")
+		fmt.Println("\t\tshow [MODULE] \t Print Saved Data")
+		fmt.Println("\tAvailable Modules: [virustotal/anyrun/malwarebazaar/hybridanalysis]")
+		fmt.Println("\tYou can also use 'all' to delete or show all modules at once")
 	} else if sliced[0] == "creds" {
 		if sliced[1] == "delete" {
 			if slices.Contains(services, sliced[2]) {
@@ -88,6 +108,10 @@ func Configmng(order string) {
 			if slices.Contains(services, sliced[2]) {
 				Q.Set(sliced[2], sliced[3])
 				Q.Configwrite()
+			}
+		} else if sliced[1] == "show" {
+			if slices.Contains(services, sliced[2]) {
+				Q.Show(sliced[2])
 			}
 		}
 	}

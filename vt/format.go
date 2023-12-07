@@ -29,7 +29,7 @@ func FtableView(f File, l int) {
 	g.AppendRow(table.Row{"Name", f.Info.Data.Attributes.Name[0]})
 	g.AppendRow(table.Row{"SHA256", f.Info.Data.Attributes.Sha256})
 	g.AppendRow(table.Row{"Magic", f.Info.Data.Attributes.Magic})
-	g.AppendRow(table.Row{"First Submission On VT", time.Unix(int64(f.Info.Data.Attributes.FirstSubmission), 0)})
+	g.AppendRow(table.Row{"First Submission On VT", TimestampConversion(f.Info.Data.Attributes.FirstSubmission)})
 	g.SetStyle(table.StyleLight)
 	g.Style().Options.SeparateRows = true
 	g.Render()
@@ -48,7 +48,7 @@ func FtableView(f File, l int) {
 	fin.Indent()
 	fin.AppendItem("Size (bytes): \t" + strconv.Itoa(f.Info.Data.Attributes.Size))
 	fin.AppendItem("Reputation: \t" + strconv.Itoa(f.Info.Data.Attributes.Reputation))
-	fin.AppendItem("Creation Time: \t" + time.Unix(int64(f.Info.Data.Attributes.CreationDate), 0).String())
+	fin.AppendItem("Creation Time: \t" + TimestampConversion(f.Info.Data.Attributes.CreationDate))
 	fin.SetStyle(list.StyleBulletCircle)
 	Listprint(fin.Render())
 	fmt.Println()
@@ -271,7 +271,7 @@ func IPtableView(ip IP) {
 	l.AppendItem("Timeout: " + fmt.Sprint(ip.Data.Attributes.LastAnalysisStats.Timeout))
 	l.SetStyle(list.StyleBulletStar)
 	Listprint(l.Render())
-	fmt.Println("Last Analysis Date: " + time.Unix(int64(ip.Data.Attributes.LastAnalysisDate), 0).String())
+	fmt.Println("Last Analysis Date: " + TimestampConversion(ip.Data.Attributes.LastAnalysisDate))
 	fmt.Println()
 
 	fmt.Println("Community Votes:")
@@ -287,11 +287,70 @@ func IPtableView(ip IP) {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Attribute", "Value"})
 	t.AppendRow(table.Row{"Whois", ip.Data.Attributes.Whois})
-	t.AppendRow(table.Row{"Whois Date", time.Unix(int64(ip.Data.Attributes.WhoisDate), 0)})
+	t.AppendRow(table.Row{"Whois Date", TimestampConversion(ip.Data.Attributes.WhoisDate)})
 	t.AppendRow(table.Row{"Tags", ip.Data.Attributes.Tags})
 	t.AppendRow(table.Row{"Network", ip.Data.Attributes.Network})
 	t.SetStyle(table.StyleColoredDark)
 	t.Render()
 	fmt.Println()
 
+	fmt.Println(ip.guiurl())
+}
+
+func DomaintableView(d Domain) {
+	fmt.Println("General Info:")
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"Attribute", "Value"})
+	t.AppendRow(table.Row{"Registrar", d.Data.Attributes.Registrar})
+	t.AppendRow(table.Row{"Last HTTPS Certificate Date", TimestampConversion(d.Data.Attributes.LastHTTPSCertificateDate)})
+	t.AppendRow(table.Row{"Creation Date", TimestampConversion(d.Data.Attributes.CreationDate)})
+	t.AppendRow(table.Row{"Reputation", d.Data.Attributes.Reputation})
+	t.AppendRow(table.Row{"Total Votes", "Harmless: " + fmt.Sprint(d.Data.Attributes.TotalVotes.Harmless) + "\nMalicious: " + fmt.Sprint(d.Data.Attributes.TotalVotes.Malicious)})
+	t.AppendRow(table.Row{"Tags", d.Data.Attributes.Tags})
+	t.SetStyle(table.StyleRounded)
+	t.Style().Options.SeparateRows = true
+	t.Render()
+	fmt.Println()
+
+	li := list.NewWriter()
+	li.AppendItem("Last Analysis Stats")
+	li.Indent()
+	li.AppendItem("Harmless: " + fmt.Sprint(d.Data.Attributes.LastAnalysisStats.Harmless))
+	li.AppendItem("Malicious: " + fmt.Sprint(d.Data.Attributes.LastAnalysisStats.Malicous))
+	li.AppendItem("Undetected: " + fmt.Sprint(d.Data.Attributes.LastAnalysisStats.Undetected))
+	li.AppendItem("Timeout: " + fmt.Sprint(d.Data.Attributes.LastAnalysisStats.Timeout))
+	li.AppendItem("Suspicious: " + fmt.Sprint(d.Data.Attributes.LastAnalysisStats.Suspicious))
+	li.UnIndent()
+	li.AppendItem("Last Analysis Date: " + TimestampConversion(d.Data.Attributes.LastAnalysisDate))
+	li.SetStyle(list.StyleConnectedLight)
+	Listprint(li.Render())
+	fmt.Println()
+
+	if len(d.Data.Attributes.CrowdSourcedContext) > 0 {
+		fmt.Println("Crowdsourced Context")
+		cr := list.NewWriter()
+		for _, c := range d.Data.Attributes.CrowdSourcedContext {
+			cr.AppendItem(c.Title)
+			cr.Indent()
+			cr.AppendItem("Source: " + c.Source)
+			cr.AppendItem("Details: " + c.Details)
+			cr.AppendItem("Severity: " + c.Severity)
+			cr.AppendItem("Timestamp: " + TimestampConversion(c.Timestamp))
+			cr.UnIndent()
+		}
+		cr.SetStyle(list.StyleConnectedRounded)
+		Listprint(cr.Render())
+		fmt.Println()
+	}
+
+	fmt.Println("Whois Data:")
+	fmt.Print(d.Data.Attributes.Whois)
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("GUI Url: " + d.guiurl())
+}
+
+func TimestampConversion(timestamp int) string {
+	return time.Unix(int64(timestamp), 0).String()
 }

@@ -23,11 +23,12 @@ func main() {
 		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
 		if p != "" {
 
-			if s.Path == "" || p == "back" || p == "clear " {
+			if s.Path == "" || p == "back" || p == "clear" || p == "exit" {
 				switch p {
 				case "help":
 					mng.HelpMenu()
 				case "exit":
+					fmt.Println("Will miss you :(")
 					os.Exit(0)
 				case "clear":
 					if runtime.GOOS == "windows" {
