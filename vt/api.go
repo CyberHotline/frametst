@@ -299,6 +299,7 @@ func Mng(order string) {
 		fmt.Println("\thelp\tPrint The Help Menu")
 		fmt.Println("\tfile [LEVEL 1-3] [HASH]\tScan a file")
 		fmt.Println("\tip [IP ADDRESS]\tReport on IP address")
+		fmt.Println("\tdomain [DOMAIN]\tReport on a Domain")
 	} else if sliced[0] == "file" {
 		level, _ := strconv.Atoi(sliced[1])
 		FtableView(Fretriever(mng.Q.VirusTotal, sliced[2], level))
