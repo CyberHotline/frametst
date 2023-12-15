@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var services = []string{"virustotal", "hybrudanalysis", "anyrun", "malwarebazaar", "all"}
+var services = []string{"virustotal", "hybridanalysis", "anyrun", "malwarebazaar", "all"}
 var Q Keys
 var homedir, _ = os.UserHomeDir()
 var cfgpath = homedir + "/.frametst_config.xml"
@@ -83,6 +83,7 @@ func HelpMenu() {
 	fmt.Println("\tModules:")
 	fmt.Println("\t config\tManage Your Config File")
 	fmt.Println("\t vt\tVirustotal Operations")
+	fmt.Println("\t ha\tHybrid Analysis Operations")
 }
 
 func Configmng(order string) {

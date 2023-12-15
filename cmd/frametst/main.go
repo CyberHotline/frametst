@@ -9,6 +9,7 @@ import (
 	"os/exec"
 
 	prom "github.com/Songmu/prompter"
+	ha "github.com/mohabgabber/frametst/ha"
 	mng "github.com/mohabgabber/frametst/shellmng"
 	vt "github.com/mohabgabber/frametst/vt"
 )
@@ -48,14 +49,19 @@ func main() {
 					s.Path = ""
 				case "vt":
 					fmt.Println("Entered virus total mode")
-					fmt.Println("USAGE: file [LEVEL 1-3] [FILE HASH]")
 					fmt.Println("Type 'help' for more info")
 					s.Path = "vt"
+				case "ha":
+					fmt.Println("Entered hybrid analysis mode")
+					fmt.Println("Type 'help' for more info")
+					s.Path = "ha"
 				}
 			} else if s.Path == "config" {
 				mng.Configmng(p)
 			} else if s.Path == "vt" {
 				vt.Mng(p)
+			} else if s.Path == "ha" {
+				ha.Mng(p)
 			}
 		}
 
