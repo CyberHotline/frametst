@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var services = []string{"virustotal", "hybridanalysis", "anyrun", "malwarebazaar", "all"}
+var services = []string{"virustotal", "hybridanalysis", "malwarebazaar", "all"}
 var Q Keys
 var homedir, _ = os.UserHomeDir()
 var cfgpath = homedir + "/.frametst_config.xml"
@@ -20,51 +20,42 @@ type Keys struct {
 	XMLName        xml.Name `xml:"APIKEYS"`
 	VirusTotal     string   `xml:"virustotal"`
 	HybridAnalysis string   `xml:"hybridanalysis"`
-	AnyRun         string   `xml:"anyrun"`
 	MalwareBazaar  string   `xml:"malwarebazaar"`
 }
 
 func (k *Keys) Reset(service string) {
-	if service == "virustotal" {
+	if service == services[0] {
 		k.VirusTotal = ""
-	} else if service == "hybridanalysis" {
+	} else if service == services[1] {
 		k.HybridAnalysis = ""
-	} else if service == "malwarebazaar" {
+	} else if service == services[2] {
 		k.MalwareBazaar = ""
-	} else if service == "anyrun" {
-		k.AnyRun = ""
-	} else if service == "all" {
+	} else if service == services[3] {
 		k.HybridAnalysis = ""
 		k.VirusTotal = ""
-		k.AnyRun = ""
 		k.MalwareBazaar = ""
 	}
 }
 
 func (k *Keys) Set(service, data string) {
-	if service == "virustotal" {
+	if service == services[0] {
 		k.VirusTotal = data
-	} else if service == "anyrun" {
-		k.AnyRun = data
-	} else if service == "malwarebazaar" {
-		k.MalwareBazaar = data
-	} else if service == "hybridanalysis" {
+	} else if service == services[1] {
 		k.HybridAnalysis = data
+	} else if service == services[2] {
+		k.MalwareBazaar = data
 	}
 }
 
 func (k *Keys) Show(service string) {
-	if service == "virustotal" {
+	if service == services[0] {
 		fmt.Println("VirusTotal: " + k.VirusTotal)
-	} else if service == "anyrun" {
-		fmt.Println("Any.Run: " + k.AnyRun)
-	} else if service == "malwarebazaar" {
+	} else if service == services[2] {
 		fmt.Println("Malware Bazaar: " + k.MalwareBazaar)
-	} else if service == "hybridanalysis" {
+	} else if service == services[1] {
 		fmt.Println("Hybrid Analysis: " + k.HybridAnalysis)
-	} else if service == "all" {
+	} else if service == services[3] {
 		fmt.Println("VirusTotal: " + k.VirusTotal)
-		fmt.Println("Any.Run: " + k.AnyRun)
 		fmt.Println("Malware Bazaar: " + k.MalwareBazaar)
 		fmt.Println("Hybrid Analysis: " + k.HybridAnalysis)
 	}
@@ -92,28 +83,26 @@ func Configmng(order string) {
 		fmt.Println("USAGE of the config module:")
 		fmt.Println("\thelp\tPrint Help Menu")
 		fmt.Println("\tManaging Saved Creds:")
-		fmt.Println("\t Example: creds set virustotal 12341234123412341234123412341234")
+		fmt.Println("\t Example: set virustotal 123412341234123412341234")
 		fmt.Println("\t Options:")
 		fmt.Println("\t\tdelete [MODULE] \t Delete Saved API Keys")
 		fmt.Println("\t\tset [MODULE] [API KEY] \t Set API Key")
 		fmt.Println("\t\tshow [MODULE] \t Print Saved Data")
-		fmt.Println("\tAvailable Modules: [virustotal/anyrun/malwarebazaar/hybridanalysis]")
+		fmt.Println("\tAvailable Modules: [virustotal/malwarebazaar/hybridanalysis]")
 		fmt.Println("\tYou can also use 'all' to delete or show all modules at once")
-	} else if sliced[0] == "creds" {
-		if sliced[1] == "delete" {
-			if slices.Contains(services, sliced[2]) {
-				Q.Reset(sliced[2])
-				Q.Configwrite()
-			}
-		} else if sliced[1] == "set" {
-			if slices.Contains(services, sliced[2]) {
-				Q.Set(sliced[2], sliced[3])
-				Q.Configwrite()
-			}
-		} else if sliced[1] == "show" {
-			if slices.Contains(services, sliced[2]) {
-				Q.Show(sliced[2])
-			}
+	} else if sliced[0] == "delete" {
+		if slices.Contains(services, sliced[1]) {
+			Q.Reset(sliced[1])
+			Q.Configwrite()
+		}
+	} else if sliced[0] == "set" {
+		if slices.Contains(services, sliced[1]) {
+			Q.Set(sliced[1], sliced[2])
+			Q.Configwrite()
+		}
+	} else if sliced[0] == "show" {
+		if slices.Contains(services, sliced[1]) {
+			Q.Show(sliced[1])
 		}
 	}
 }

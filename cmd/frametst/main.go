@@ -23,7 +23,6 @@ func main() {
 	for {
 		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
 		if p != "" {
-
 			if s.Path == "" || p == "back" || p == "clear" || p == "exit" {
 				switch p {
 				case "help":
