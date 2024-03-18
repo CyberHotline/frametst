@@ -15,8 +15,8 @@ import (
 var BASEURL string = "https://www.virustotal.com/api/v3/"
 
 type File struct {
-	Info      FileInfo
-	Behaviour Filebehaviour
+	Info     FileInfo
+	Behavior FileBehavior
 }
 
 type FileInfo struct {
@@ -54,7 +54,7 @@ type FileInfo struct {
 	} `json:"data"`
 }
 
-type Filebehaviour struct {
+type FileBehavior struct {
 	Data struct {
 		CallsHighlighted    []string `json:"calls_highlighted"`
 		MutexesCreated      []string `json:"mutexes_created"`
@@ -92,9 +92,9 @@ type Filebehaviour struct {
 		MemoryPatternIps      []string `json:"memory_pattern_ips"`
 		MemoryPatternDomains  []string `json:"memory_pattern_domains"`
 		HTTPConversations     []struct {
-			URL            string `json:"url"`
-			Method         string `json:"request_method"`
-			ResonseHeaders struct {
+			URL             string `json:"url"`
+			Method          string `json:"request_method"`
+			ResponseHeaders struct {
 				ContentLength string `json:"Content-Length"`
 				SetCookie     string `json:"Set-Cookie"`
 				StatusLine    string `json:"Status-Line"`
@@ -223,7 +223,7 @@ func Fretriever(key, id string, l int) (File, int) {
 
 	// Retrieving File Data
 	var file File
-	var b Filebehaviour
+	var b FileBehavior
 	var i FileInfo
 	ierr := json.Unmarshal([]byte(infobody), &i)
 	berr := json.Unmarshal([]byte(behaviourbody), &b)
@@ -232,11 +232,11 @@ func Fretriever(key, id string, l int) (File, int) {
 		log.Fatal(ierr)
 	}
 	if berr != nil {
-		fmt.Println("Behaviour Error:")
+		fmt.Println("Behavior Error:")
 		log.Fatal(berr)
 	}
 	file.Info = i
-	file.Behaviour = b
+	file.Behavior = b
 	return file, l
 }
 

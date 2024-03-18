@@ -64,20 +64,20 @@ func FtableView(f File, l int) {
 		fmt.Println()
 	}
 
-	if len(f.Behaviour.Data.Verdicts) > 0 {
+	if len(f.Behavior.Data.Verdicts) > 0 {
 		fmt.Println("Verdicts")
 		ver := list.NewWriter()
-		for _, c := range f.Behaviour.Data.Verdicts {
+		for _, c := range f.Behavior.Data.Verdicts {
 			ver.AppendItem(c)
 		}
 		ver.SetStyle(list.StyleBulletTriangle)
 		Listprint(ver.Render())
 		fmt.Println()
 	}
-	if len(f.Behaviour.Data.CommandExecutions) > 0 {
+	if len(f.Behavior.Data.CommandExecutions) > 0 {
 		fmt.Println("Command Executions")
 		com := list.NewWriter()
-		for _, c := range f.Behaviour.Data.CommandExecutions {
+		for _, c := range f.Behavior.Data.CommandExecutions {
 			com.AppendItem(c)
 		}
 		com.SetStyle(list.StyleBulletStar)
@@ -122,10 +122,10 @@ func FtableView(f File, l int) {
 		a.Render()
 		fmt.Println()
 
-		if len(f.Behaviour.Data.CallsHighlighted) > 0 {
+		if len(f.Behavior.Data.CallsHighlighted) > 0 {
 			fmt.Println("Calls Highlighted")
 			cal := list.NewWriter()
-			for _, c := range f.Behaviour.Data.CallsHighlighted {
+			for _, c := range f.Behavior.Data.CallsHighlighted {
 				cal.AppendItem(c)
 			}
 			cal.SetStyle(list.StyleBulletFlower)
@@ -133,10 +133,10 @@ func FtableView(f File, l int) {
 			fmt.Println()
 		}
 
-		if len(f.Behaviour.Data.TextHighlighted) > 0 {
+		if len(f.Behavior.Data.TextHighlighted) > 0 {
 			fmt.Println("Text Highlighted")
 			text := list.NewWriter()
-			for _, c := range f.Behaviour.Data.TextHighlighted {
+			for _, c := range f.Behavior.Data.TextHighlighted {
 				text.AppendItem(c)
 			}
 			text.SetStyle(list.StyleBulletSquare)
@@ -144,12 +144,12 @@ func FtableView(f File, l int) {
 			fmt.Println()
 		}
 
-		if len(f.Behaviour.Data.MitreAttackTechniques) > 0 {
+		if len(f.Behavior.Data.MitreAttackTechniques) > 0 {
 			fmt.Println("MITRE Attack Techniques")
 			mitre := table.NewWriter()
 			mitre.SetOutputMirror(os.Stdout)
 			mitre.AppendHeader(table.Row{"Attack ID", "Signature Description"})
-			for _, c := range f.Behaviour.Data.MitreAttackTechniques {
+			for _, c := range f.Behavior.Data.MitreAttackTechniques {
 				mitre.AppendRow(table.Row{c.ID, c.SignatureDescription})
 			}
 			mitre.SetStyle(table.StyleRounded)
@@ -158,10 +158,10 @@ func FtableView(f File, l int) {
 			fmt.Println()
 		}
 
-		if len(f.Behaviour.Data.ProcessTree) > 0 {
+		if len(f.Behavior.Data.ProcessTree) > 0 {
 			fmt.Println("Process Tree")
 			prt := list.NewWriter()
-			for _, c := range f.Behaviour.Data.ProcessTree {
+			for _, c := range f.Behavior.Data.ProcessTree {
 				prt.AppendItem("Name: " + c.Name + " PID: " + c.PID)
 				if len(c.Children) > 0 {
 					prt.Indent()
@@ -184,10 +184,10 @@ func FtableView(f File, l int) {
 
 		}
 
-		if len(f.Behaviour.Data.ProcessesTerminated) > 0 {
+		if len(f.Behavior.Data.ProcessesTerminated) > 0 {
 			fmt.Println("Processes Terminated")
 			prterm := list.NewWriter()
-			for _, c := range f.Behaviour.Data.ProcessesTerminated {
+			for _, c := range f.Behavior.Data.ProcessesTerminated {
 				prterm.AppendItem(c)
 			}
 			prterm.SetStyle(list.StyleConnectedBold)
@@ -199,10 +199,10 @@ func FtableView(f File, l int) {
 	}
 
 	if l >= 3 {
-		if len(f.Behaviour.Data.DNSLookup) > 0 {
+		if len(f.Behavior.Data.DNSLookup) > 0 {
 			fmt.Println("DNS Lookup")
 			dns := list.NewWriter()
-			for _, d := range f.Behaviour.Data.DNSLookup {
+			for _, d := range f.Behavior.Data.DNSLookup {
 				dns.AppendItem("Hostname: " + d.Hostname)
 				if len(d.ResolvedIPs) > 0 {
 					dns.Indent()
@@ -218,10 +218,10 @@ func FtableView(f File, l int) {
 			fmt.Println()
 		}
 
-		if len(f.Behaviour.Data.IPTraffic) > 0 {
+		if len(f.Behavior.Data.IPTraffic) > 0 {
 			fmt.Println("IP Traffic")
 			ipt := list.NewWriter()
-			for _, t := range f.Behaviour.Data.IPTraffic {
+			for _, t := range f.Behavior.Data.IPTraffic {
 				ipt.AppendItem(t.DestinationIP)
 				ipt.Indent()
 				ipt.AppendItem("Port: " + strconv.Itoa(t.DestinationPort))
@@ -233,19 +233,19 @@ func FtableView(f File, l int) {
 			fmt.Println()
 		}
 
-		if len(f.Behaviour.Data.HTTPConversations) > 0 {
+		if len(f.Behavior.Data.HTTPConversations) > 0 {
 			fmt.Println("HTTP Conversations")
 			http := list.NewWriter()
-			for _, h := range f.Behaviour.Data.HTTPConversations {
+			for _, h := range f.Behavior.Data.HTTPConversations {
 				http.AppendItem(h.Method + " " + h.URL)
-				if h.ResonseHeaders.Server != "" && h.ResonseHeaders.ContentType != "" && h.ResonseHeaders.Date != "" {
+				if h.ResponseHeaders.Server != "" && h.ResponseHeaders.ContentType != "" && h.ResponseHeaders.Date != "" {
 					http.Indent()
-					http.AppendItem("Content Type: " + h.ResonseHeaders.ContentType)
-					http.AppendItem("Server: " + h.ResonseHeaders.Server)
-					http.AppendItem("Date: " + h.ResonseHeaders.Date)
-					http.AppendItem("Content Length: " + h.ResonseHeaders.ContentLength)
-					http.AppendItem("Set Cookie: " + h.ResonseHeaders.SetCookie)
-					http.AppendItem("Status Line: " + h.ResonseHeaders.StatusLine)
+					http.AppendItem("Content Type: " + h.ResponseHeaders.ContentType)
+					http.AppendItem("Server: " + h.ResponseHeaders.Server)
+					http.AppendItem("Date: " + h.ResponseHeaders.Date)
+					http.AppendItem("Content Length: " + h.ResponseHeaders.ContentLength)
+					http.AppendItem("Set Cookie: " + h.ResponseHeaders.SetCookie)
+					http.AppendItem("Status Line: " + h.ResponseHeaders.StatusLine)
 					http.UnIndent()
 				}
 			}
