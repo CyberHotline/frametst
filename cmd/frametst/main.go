@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 
-	"os"
-	"os/exec"
-
 	prom "github.com/Songmu/prompter"
 	ha "github.com/mohabgabber/frametst/ha"
+	mb "github.com/mohabgabber/frametst/mb"
 	mng "github.com/mohabgabber/frametst/shellmng"
 	vt "github.com/mohabgabber/frametst/vt"
 )
@@ -23,7 +23,6 @@ func main() {
 	for {
 		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
 		if p != "" {
-
 			if s.Path == "" || p == "back" || p == "clear" || p == "exit" {
 				switch p {
 				case "help":
@@ -48,22 +47,28 @@ func main() {
 					fmt.Println("Back to normal mode")
 					s.Path = ""
 				case "vt":
-					fmt.Println("Entered virus total mode")
+					fmt.Println("Entered Virus Total mode")
 					fmt.Println("Type 'help' for more info")
 					s.Path = "vt"
 				case "ha":
-					fmt.Println("Entered hybrid analysis mode")
+					fmt.Println("Entered Hybrid Analysis mode")
 					fmt.Println("Type 'help' for more info")
 					s.Path = "ha"
+				case "mb":
+					fmt.Println("Entered Malware Bazaar mode")
+					fmt.Println("Type 'help' for more info")
+					s.Path = "mb"
 				}
+
 			} else if s.Path == "config" {
 				mng.Configmng(p)
 			} else if s.Path == "vt" {
 				vt.Mng(p)
 			} else if s.Path == "ha" {
 				ha.Mng(p)
+			} else if s.Path == "mb" {
+				mb.Mng(p)
 			}
 		}
-
 	}
 }
