@@ -1,4 +1,4 @@
-module github.com/mohabgabber/frametst
+module github.com/cyberhotline/frametst
 
 go 1.21.4
 
