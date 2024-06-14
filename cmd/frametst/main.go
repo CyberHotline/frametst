@@ -8,17 +8,13 @@ import (
 	"strings"
 
 	prom "github.com/Songmu/prompter"
-	ha "github.com/mohabgabber/frametst/ha"
-	mb "github.com/mohabgabber/frametst/mb"
-	mng "github.com/mohabgabber/frametst/shellmng"
-	vt "github.com/mohabgabber/frametst/vt"
 )
 
 type Shell struct {
 	Path string
 }
 
-func main() {
+func shell() {
 	var s Shell
 	for {
 		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
@@ -26,7 +22,7 @@ func main() {
 			if s.Path == "" || p == "back" || p == "clear" || p == "exit" {
 				switch p {
 				case "help":
-					mng.HelpMenu()
+					HelpMenu()
 				case "exit":
 					fmt.Println("Will miss you :(")
 					os.Exit(0)
@@ -61,14 +57,17 @@ func main() {
 				}
 
 			} else if s.Path == "config" {
-				mng.Configmng(p)
-			} else if s.Path == "vt" {
-				vt.Mng(p)
-			} else if s.Path == "ha" {
-				ha.Mng(p)
-			} else if s.Path == "mb" {
-				mb.Mng(p)
-			}
+				Configmng(p)
+			} // else if s.Path == "vt" {
+			// 	api.Mng(p)
+			// } else if s.Path == "ha" {
+			// 	api.Mng(p)
+			// } else if s.Path == "mb" {
+			// 	api.Mng(p)
+			// }
 		}
 	}
+}
+func main() {
+	shell()
 }
