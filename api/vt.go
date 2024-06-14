@@ -1,4 +1,4 @@
-package apis
+package api
 
 type VTFile struct {
 	Info     FileInfo

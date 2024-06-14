@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	prom "github.com/Songmu/prompter"
-	ha "github.com/mohabgabber/frametst/ha"
-	mb "github.com/mohabgabber/frametst/mb"
 )
 
 type Shell struct {
@@ -24,7 +22,7 @@ func shell() {
 			if s.Path == "" || p == "back" || p == "clear" || p == "exit" {
 				switch p {
 				case "help":
-					mng.HelpMenu()
+					HelpMenu()
 				case "exit":
 					fmt.Println("Will miss you :(")
 					os.Exit(0)
@@ -60,13 +58,13 @@ func shell() {
 
 			} else if s.Path == "config" {
 				Configmng(p)
-			} else if s.Path == "vt" {
-				vt.Mng(p)
-			} else if s.Path == "ha" {
-				ha.Mng(p)
-			} else if s.Path == "mb" {
-				mb.Mng(p)
-			}
+			} // else if s.Path == "vt" {
+			// 	api.Mng(p)
+			// } else if s.Path == "ha" {
+			// 	api.Mng(p)
+			// } else if s.Path == "mb" {
+			// 	api.Mng(p)
+			// }
 		}
 	}
 }

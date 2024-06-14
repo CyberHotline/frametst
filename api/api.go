@@ -1,4 +1,4 @@
-package apis
+package api
 
 var VTBASE string = "https://www.virustotal.com/api/v3/"
 var MBBASE string = "https://mb-api.abuse.ch/api/v1/"
