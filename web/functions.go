@@ -3,7 +3,7 @@ package webenum
 import (
 	"bufio"
 	"log"
-	http "net/http"
+	"net/http"
 	"os"
 	"strconv"
 )
