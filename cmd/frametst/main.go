@@ -10,15 +10,13 @@ import (
 	prom "github.com/Songmu/prompter"
 	ha "github.com/mohabgabber/frametst/ha"
 	mb "github.com/mohabgabber/frametst/mb"
-	mng "github.com/mohabgabber/frametst/shellmng"
-	vt "github.com/mohabgabber/frametst/vt"
 )
 
 type Shell struct {
 	Path string
 }
 
-func main() {
+func shell() {
 	var s Shell
 	for {
 		p := strings.TrimSpace(prom.Prompt("#"+s.Path+">", ""))
@@ -61,7 +59,7 @@ func main() {
 				}
 
 			} else if s.Path == "config" {
-				mng.Configmng(p)
+				Configmng(p)
 			} else if s.Path == "vt" {
 				vt.Mng(p)
 			} else if s.Path == "ha" {
@@ -71,4 +69,7 @@ func main() {
 			}
 		}
 	}
+}
+func main() {
+	shell()
 }

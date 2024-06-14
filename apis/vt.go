@@ -1,20 +1,6 @@
-package vt
+package apis
 
-import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"strconv"
-	"strings"
-
-	mng "github.com/mohabgabber/frametst/shellmng"
-)
-
-var BASEURL string = "https://www.virustotal.com/api/v3/"
-
-type File struct {
+type VTFile struct {
 	Info     FileInfo
 	Behavior FileBehavior
 }
@@ -123,10 +109,6 @@ type FileBehavior struct {
 	} `json:"data"`
 }
 
-func (f File) guiurl() string {
-	return "https://www.virustotal.com/gui/file/" + f.Info.Data.Attributes.Sha256
-}
-
 type IP struct {
 	Address string
 	Data    struct {
@@ -150,10 +132,6 @@ type IP struct {
 			} `json:"total_votes"`
 		} `json:"attributes"`
 	} `json:"data"`
-}
-
-func (add IP) guiurl() string {
-	return "https://www.virustotal.com/gui/ip-address/" + add.Address
 }
 
 type Domain struct {
@@ -195,117 +173,4 @@ type Domain struct {
 			} `json:"total_votes"`
 		} `json:"attributes"`
 	} `json:"data"`
-}
-
-func (d Domain) guiurl() string {
-	return "https://www.virustotal.com/gui/domain/" + d.Domain
-}
-
-func Fretriever(key, id string, l int) (File, int) {
-	infourl := BASEURL + "files/" + id
-	behavioururl := BASEURL + "files/" + id + "/behaviour_summary"
-
-	inforeq, _ := http.NewRequest("GET", infourl, nil)
-	behaviourreq, _ := http.NewRequest("GET", behavioururl, nil)
-	inforeq.Header.Add("accept", "application/json")
-	inforeq.Header.Add("x-apikey", key)
-	behaviourreq.Header.Add("accept", "application/json")
-	behaviourreq.Header.Add("x-apikey", key)
-
-	infores, _ := http.DefaultClient.Do(inforeq)
-	behaviourres, _ := http.DefaultClient.Do(behaviourreq)
-
-	defer infores.Body.Close()
-	defer behaviourres.Body.Close()
-
-	infobody, _ := io.ReadAll(infores.Body)
-	behaviourbody, _ := io.ReadAll(behaviourres.Body)
-
-	// Retrieving File Data
-	var file File
-	var b FileBehavior
-	var i FileInfo
-	ierr := json.Unmarshal([]byte(infobody), &i)
-	berr := json.Unmarshal([]byte(behaviourbody), &b)
-	if ierr != nil {
-		fmt.Println("Info Error:")
-		log.Fatal(ierr)
-	}
-	if berr != nil {
-		fmt.Println("Behavior Error:")
-		log.Fatal(berr)
-	}
-	file.Info = i
-	file.Behavior = b
-	return file, l
-}
-
-func IPRetriever(key, ip string) IP {
-	infourl := BASEURL + "ip_addresses/" + ip
-
-	inforeq, _ := http.NewRequest("GET", infourl, nil)
-	inforeq.Header.Add("accept", "application/json")
-	inforeq.Header.Add("x-apikey", key)
-
-	infores, err := http.DefaultClient.Do(inforeq)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer infores.Body.Close()
-
-	infobody, _ := io.ReadAll(infores.Body)
-
-	// Retrieving IP Data
-	var ADD IP
-	ierr := json.Unmarshal([]byte(infobody), &ADD)
-	if ierr != nil {
-		fmt.Println("Info Error:")
-		log.Fatal(ierr)
-	}
-	ADD.Address = ip
-	return ADD
-}
-
-func DomainRetriever(key, domain string) Domain {
-	infourl := BASEURL + "domains/" + domain
-
-	inforeq, _ := http.NewRequest("GET", infourl, nil)
-	inforeq.Header.Add("accept", "application/json")
-	inforeq.Header.Add("x-apikey", key)
-
-	infores, err := http.DefaultClient.Do(inforeq)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer infores.Body.Close()
-
-	infobody, _ := io.ReadAll(infores.Body)
-
-	// Retrieving IP Data
-	var D Domain
-	ierr := json.Unmarshal([]byte(infobody), &D)
-	if ierr != nil {
-		fmt.Println("Info Error:")
-		log.Fatal(ierr)
-	}
-	D.Domain = domain
-	return D
-}
-
-func Mng(order string) {
-	sliced := strings.Split(order, " ")
-	if sliced[0] == "help" {
-		fmt.Println("USAGE of the virustotal module:")
-		fmt.Println("\thelp\tPrint The Help Menu")
-		fmt.Println("\tfile [LEVEL 1-3] [HASH]\tScan a file")
-		fmt.Println("\tip [IP ADDRESS]\tReport on IP address")
-		fmt.Println("\tdomain [DOMAIN]\tReport on a Domain")
-	} else if sliced[0] == "file" {
-		level, _ := strconv.Atoi(sliced[1])
-		FtableView(Fretriever(mng.Q.VirusTotal, sliced[2], level))
-	} else if sliced[0] == "ip" {
-		IPtableView(IPRetriever(mng.Q.VirusTotal, sliced[1]))
-	} else if sliced[0] == "domain" {
-		DomaintableView(DomainRetriever(mng.Q.VirusTotal, sliced[1]))
-	}
 }
